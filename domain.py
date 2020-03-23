@@ -5,6 +5,10 @@ from datetime import datetime
 import typing as t
 
 
+class AllocationError(Exception):
+    pass
+
+
 @dataclass
 class Product:
     sku: str
@@ -14,7 +18,7 @@ class Product:
 class Line:
     order: str = field(hash=True)
     sku: str = field(hash=True)
-    quantity: int = field(compare=False)
+    quantity: int = field(hash=True)
 
 
 @dataclass
@@ -56,11 +60,14 @@ class Batch:
             return False
         return True
 
+    def is_allocated(self, line):
+        return line in self.allocations
+
     def allocate(self, line: Line) -> None:
-        if line in self.allocations:
+        if self.is_allocated(line):
             return
-            return True  # ???: not clear behavior, move to can_allocate maybe?
-        assert self.can_allocate(line), "Cannot allocate"
+        if not self.can_allocate(line):
+            raise AllocationError(f"Cannot allocate f{line}")
         self.allocations.add(line)
         self.quantity -= line.quantity
 
@@ -73,14 +80,32 @@ class Batch:
 class BatchRepository:
     batches: List[Batch] = field(default_factory=list)
 
+    def is_allocated(self, line):
+        for batch in self.batches:
+            if batch.is_allocated(line):
+                return True
+        return False
+
+    def allocate(self, line: Line) -> None:
+        if self.is_allocated(line):
+            return
+        batches = [i for i in self.batches if i.sku == line.sku and i.quantity >= line.quantity]
+        if not batches:
+            raise AllocationError(f"cannot allocate f{line}")
+        batches.sort()
+        batches[0].allocate(line)
+
+    def deallocate(self, line: Line) -> None:
+        for batch in self.batches:
+            if batch.is_allocated(line):
+                batch.deallocate(line)
+
 
 def allocate_order(batch_repository: BatchRepository, order: Order) -> None:
-    for line in order.lines:
-        allocate_line(batch_repository, line)
-
-
-def allocate_line(batch_repository: BatchRepository, line: Line) -> None:
-    batches = [i for i in batch_repository.batches if i.sku == line.sku and i.quantity >= line.quantity]
-    assert batches, f"cannot allocate f{line}"
-    batches.sort()
-    batches[0].allocate(line)
+    try:
+        for line in order.lines:
+            batch_repository.allocate(line)
+    except Exception:
+        for line in order.lines:
+            batch_repository.deallocate(line)
+        raise
