@@ -1,6 +1,6 @@
-import domain
+import models
 
 
 def test_product():
-    product = domain.Product(sku=1)
+    product = models.Product(sku=1)
     assert product.sku == 1
