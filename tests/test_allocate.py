@@ -46,7 +46,7 @@ def test_allocation_atomicity_fail():
         ]
     )
     batch_repository = faker.batch_repository()
-    with pytest.raises(domain.AllocationError):
+    with pytest.raises(domain.OutOfStockException):
         domain.allocate_order(batch_repository, order)
     assert batch_repository.batches[0].quantity == 5
     assert not batch_repository.batches[0].allocations

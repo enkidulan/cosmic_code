@@ -5,7 +5,7 @@ from datetime import datetime
 import typing as t
 
 
-class AllocationError(Exception):
+class OutOfStockException(Exception):
     pass
 
 
@@ -60,14 +60,14 @@ class Batch:
             return False
         return True
 
-    def is_allocated(self, line):
+    def is_allocated(self, line: Line) -> bool:
         return line in self.allocations
 
     def allocate(self, line: Line) -> None:
         if self.is_allocated(line):
             return
         if not self.can_allocate(line):
-            raise AllocationError(f"Cannot allocate f{line}")
+            raise OutOfStockException(f"Cannot allocate f{line}")
         self.allocations.add(line)
         self.quantity -= line.quantity
 
@@ -80,7 +80,7 @@ class Batch:
 class BatchRepository:
     batches: List[Batch] = field(default_factory=list)
 
-    def is_allocated(self, line):
+    def is_allocated(self, line: Line) -> bool:
         for batch in self.batches:
             if batch.is_allocated(line):
                 return True
@@ -91,7 +91,7 @@ class BatchRepository:
             return
         batches = [i for i in self.batches if i.sku == line.sku and i.quantity >= line.quantity]
         if not batches:
-            raise AllocationError(f"cannot allocate f{line}")
+            raise OutOfStockException(f"cannot allocate f{line}")
         batches.sort()
         batches[0].allocate(line)
 
