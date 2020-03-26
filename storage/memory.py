@@ -8,7 +8,10 @@ import interfaces
 @interface.implementer(interfaces.IBatchRepository)
 @dataclass
 class BatchRepository:
-    batches: t.List[interfaces.IBatch] = field(default_factory=list)
+    batches: t.List[interfaces.IBatch] = field(default_factory=list, init=False)
+
+    def add_batch(self, batch):
+        self.batches.append(batch)
 
     def is_allocated(self, line: interfaces.ILine) -> bool:
         for batch in self.batches:

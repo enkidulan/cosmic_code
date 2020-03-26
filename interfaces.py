@@ -50,3 +50,6 @@ class IBatchRepository(interface.Interface):
 
     def deallocate(line: ILine) -> None:
         pass
+
+    def add(batch: IBatch) -> None:
+        pass

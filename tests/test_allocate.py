@@ -3,50 +3,44 @@ import domain
 from tests import faker
 
 
-def test_allocate_fist_to_warehause():
+def test_allocate_fist_to_warehause(batch_repository):
     line = faker.line(quantity=1)
-    order = faker.order(lines=[line])
-    batch_repository = faker.batch_repository()
+    order = faker.order(lines={line})
     domain.allocate_order(batch_repository, order)
     assert line in batch_repository.batches[1].allocations
 
 
-def test_allocate_fist_to_erliest_eta():
+def test_allocate_fist_to_erliest_eta(batch_repository):
     line = faker.line(quantity=5)
-    order = faker.order(lines=[line])
-    batch_repository = faker.batch_repository()
-    batch_repository.batches = batch_repository.batches[::-1]
+    order = faker.order(lines={line})
     domain.allocate_order(batch_repository, order)
     assert line in batch_repository.batches[2].allocations
 
 
-def test_allocate_last_to_latest_eta():
+def test_allocate_last_to_latest_eta(batch_repository):
     line = faker.line(quantity=10)
-    order = faker.order(lines=[line])
-    batch_repository = faker.batch_repository()
+    order = faker.order(lines={line})
     domain.allocate_order(batch_repository, order)
     assert line in batch_repository.batches[2].allocations
 
 
-def test_allocate():
+def test_allocate(batch_repository):
     order = faker.order()
-    batch_repository = faker.batch_repository()
     domain.allocate_order(batch_repository, order)
     assert order.lines[0] in batch_repository.batches[0].allocations
     assert order.lines[1] in batch_repository.batches[1].allocations
     assert order.lines[2] in batch_repository.batches[2].allocations
 
 
-def test_allocation_atomicity_fail():
+def test_allocation_atomicity_fail(batch_repository):
     from exceptions import OutOfStockException
     order = faker.order(
-        lines=[
+        lines={
             faker.line(quantity=10),
             faker.line(quantity=4),
             faker.line(quantity=6),
-        ]
+        }
     )
-    batch_repository = faker.batch_repository()
     with pytest.raises(OutOfStockException):
         domain.allocate_order(batch_repository, order)
     assert batch_repository.batches[0].quantity == 5
@@ -57,10 +51,9 @@ def test_allocation_atomicity_fail():
     assert not batch_repository.batches[2].allocations
 
 
-def test_allocate_already_allocated():
+def test_allocate_already_allocated(batch_repository):
     line = faker.line(quantity=3)
-    order = faker.order(lines=[line])
-    batch_repository = faker.batch_repository()
+    order = faker.order(lines={line})
     batch_repository.batches[2].allocate(line)
     assert line in batch_repository.batches[2].allocations
     domain.allocate_order(batch_repository, order)
