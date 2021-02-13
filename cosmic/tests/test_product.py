@@ -1,4 +1,4 @@
-import models
+from cosmic import models
 
 
 def test_product():

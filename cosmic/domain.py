@@ -1,5 +1,5 @@
 from __future__ import annotations
-from interfaces import IBatchRepository, IOrder
+from .interfaces import IBatchRepository, IOrder
 
 
 def allocate_order(batch_repository: IBatchRepository, order: IOrder) -> None:

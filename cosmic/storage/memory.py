@@ -1,8 +1,8 @@
 import typing as t
 from zope import interface
 from dataclasses import dataclass, field
-from exceptions import OutOfStockException
-import interfaces
+from cosmic.exceptions import OutOfStockException
+from cosmic import interfaces
 
 
 @interface.implementer(interfaces.IBatchRepository)

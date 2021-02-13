@@ -3,10 +3,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 
-from storage.memory import BatchRepository
-from storage.sqla import BatchRepository, metadata, setup_mappers
+from cosmic.storage.memory import BatchRepository
+from cosmic.storage.sqla import BatchRepository, metadata, setup_mappers
 
-from tests import faker
+from cosmic.tests import faker
 
 
 @pytest.fixture(scope='session')

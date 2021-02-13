@@ -3,9 +3,9 @@ from dataclasses import dataclass, field
 from datetime import datetime
 import typing as t
 from zope import interface
-from exceptions import OutOfStockException
+from .exceptions import OutOfStockException
 
-import interfaces
+from . import interfaces
 
 
 @interface.implementer(interfaces.IProduct)
@@ -36,7 +36,7 @@ class Batch:
     sku: str = field(compare=False)
     quantity: int = field(compare=False)
     eta: t.Optional[datetime] = field(compare=False, default=None)
-    allocations: t.Set[interfaces.ILine] = field(compare=False, default_factory=set, init=False)
+    allocations: t.Set[interfaces.ILine] = field(compare=False, default_factory=set, repr=False, init=False)
     purchased_quantity: int = field(compare=False, init=False)
 
     def __post_init__(self) -> None:

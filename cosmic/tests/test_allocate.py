@@ -1,6 +1,7 @@
 import pytest
-import domain
-from tests import faker
+from cosmic import domain
+from cosmic import models
+from cosmic.tests import faker
 
 
 def test_allocate_fist_to_warehause(batch_repository):
@@ -25,15 +26,20 @@ def test_allocate_last_to_latest_eta(batch_repository):
 
 
 def test_allocate(batch_repository):
-    order = faker.order()
+    lines = [
+        models.Line(order='order-1', sku='TEST-LAMP', quantity=5),
+        models.Line(order='order-1', sku='TEST-LAMP', quantity=3),
+        models.Line(order='order-1', sku='TEST-LAMP', quantity=2),
+    ]
+    order = faker.order(lines=set(lines))
     domain.allocate_order(batch_repository, order)
-    assert order.lines[0] in batch_repository.batches[0].allocations
-    assert order.lines[1] in batch_repository.batches[1].allocations
-    assert order.lines[2] in batch_repository.batches[2].allocations
+    assert lines[0] in batch_repository.batches[0].allocations
+    assert lines[1] in batch_repository.batches[1].allocations
+    assert lines[2] in batch_repository.batches[2].allocations
 
 
 def test_allocation_atomicity_fail(batch_repository):
-    from exceptions import OutOfStockException
+    from cosmic.exceptions import OutOfStockException
     order = faker.order(
         lines={
             faker.line(quantity=10),

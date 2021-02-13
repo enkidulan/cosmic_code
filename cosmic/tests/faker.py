@@ -1,5 +1,5 @@
 from datetime import datetime
-import models
+from cosmic import models
 
 
 def batch(reference="reference-1", sku="TEST-LAMP", quantity=20, eta=datetime(1999, 1, 1)):
@@ -12,9 +12,9 @@ def line(order='order-1', sku="TEST-LAMP", quantity=10):
 
 def order(reference="reference-1", lines=None):
     if lines is None:
-        lines = set([
+        lines = {
             line(quantity=5),
             line(quantity=3),
             line(quantity=2),
-        ])
+        }
     return models.Order(reference=reference, lines=lines)

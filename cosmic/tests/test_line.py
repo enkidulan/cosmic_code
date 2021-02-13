@@ -1,4 +1,4 @@
-from tests import faker
+from cosmic.tests import faker
 
 
 def test_line():
