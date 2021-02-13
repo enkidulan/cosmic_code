@@ -10,7 +10,7 @@ from cosmic import models
 
 __all__ = ["BatchRepository"]
 
-engine = sa.create_engine('sqlite:///:memory:')
+engine = sa.create_engine("sqlite:///:memory:")
 
 
 def generate_uuid():
@@ -20,7 +20,7 @@ def generate_uuid():
 metadata = sa.MetaData()
 
 product = sa.Table(
-    'products',
+    "products",
     metadata,
     sa.Column("uuid", sa.String, primary_key=True, default=generate_uuid),
     sa.Column("sku", sa.String, unique=True),
@@ -28,18 +28,18 @@ product = sa.Table(
 
 
 line = sa.Table(
-    'lines',
+    "lines",
     metadata,
     sa.Column("uuid", sa.String, primary_key=True, default=generate_uuid),
     sa.Column("order", sa.String),  # ref
-    sa.Column("order_id", sa.ForeignKey('orders.uuid')),  # ref
+    sa.Column("order_id", sa.ForeignKey("orders.uuid")),  # ref
     sa.Column("sku", sa.String),
     sa.Column("quantity", sa.String),
 )
 
 
 order = sa.Table(
-    'orders',
+    "orders",
     metadata,
     sa.Column("uuid", sa.String, primary_key=True, default=generate_uuid),
     sa.Column("reference", sa.String),
@@ -48,7 +48,7 @@ order = sa.Table(
 
 
 batch = sa.Table(
-    'batches',
+    "batches",
     metadata,
     sa.Column("uuid", sa.String, primary_key=True, default=generate_uuid),
     sa.Column("reference", sa.String),
@@ -61,35 +61,42 @@ batch = sa.Table(
 
 
 allocations = sa.Table(
-    'allocations',
+    "allocations",
     metadata,
     sa.Column("uuid", sa.String, primary_key=True, default=generate_uuid),
-    sa.Column('line_id', sa.ForeignKey('lines.uuid')),
-    sa.Column('batch_id', sa.ForeignKey('batches.uuid')),
+    sa.Column("line_id", sa.ForeignKey("lines.uuid")),
+    sa.Column("batch_id", sa.ForeignKey("batches.uuid")),
 )
 
 
 def setup_mappers():
     product_mapper = sa.orm.mapper(models.Product, product)
     lines_mapper = sa.orm.mapper(models.Line, line)
-    order_mapper = sa.orm.mapper(models.Order, order, properties={
-        'lines': sa.orm.relationship(
-            lines_mapper,
-            collection_class=set,
-        )
-    })
-    batch_mapper = sa.orm.mapper(models.Batch, batch, properties={
-        'allocations': sa.orm.relationship(
-            lines_mapper,
-            secondary=allocations,
-            collection_class=set,
-        )
-    })
+    order_mapper = sa.orm.mapper(
+        models.Order,
+        order,
+        properties={
+            "lines": sa.orm.relationship(
+                lines_mapper,
+                collection_class=set,
+            )
+        },
+    )
+    batch_mapper = sa.orm.mapper(
+        models.Batch,
+        batch,
+        properties={
+            "allocations": sa.orm.relationship(
+                lines_mapper,
+                secondary=allocations,
+                collection_class=set,
+            )
+        },
+    )
 
 
 @interface.implementer(interfaces.IBatchRepository)
 class BatchRepository:
-
     def __init__(self, session=None):
         self.session = session
 
@@ -109,7 +116,9 @@ class BatchRepository:
     def allocate(self, line: interfaces.ILine) -> None:
         if self.is_allocated(line):
             return
-        batches = [i for i in self.batches if i.sku == line.sku and i.quantity >= line.quantity]
+        batches = [
+            i for i in self.batches if i.sku == line.sku and i.quantity >= line.quantity
+        ]
         if not batches:
             raise OutOfStockException(f"cannot allocate f{line}")
         batches.sort()

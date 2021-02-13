@@ -6,7 +6,7 @@ def allocate_order(batch_repository: IBatchRepository, order: IOrder) -> None:
     try:
         for line in order.lines:
             batch_repository.allocate(line)
-    except:
+    except Exception:
         for line in order.lines:
             batch_repository.deallocate(line)
         raise

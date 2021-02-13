@@ -12,11 +12,12 @@ class IProduct(interface.Interface):
     * tasteless lamp
     """
 
-    sku: str = interface.Attribute("""
+    sku: str = interface.Attribute(
+        """
         Stock-keeping unit, a human-friendly product identifier.
 
-        For example: 'RED-CHAIR' or 'TASTELESS-LAMP'.""")
-
+        For example: 'RED-CHAIR' or 'TASTELESS-LAMP'."""
+    )
 
 
 class ILine(interface.Interface):
@@ -45,12 +46,19 @@ class IBatch(interface.Interface):
     When we’ve allocated an order line to a batch, we will send stock from that specific batch
     to the customer’s delivery address.
     """
+
     reference: str = interface.Attribute("ID of a :class:`IBatch`.")
     sku: str = interface.Attribute("SKU of a :class:`IProduct`.")
-    quantity: int = interface.Attribute("Avalivable quantity of :class:`IProduct`s. in this :class:`IBatch`.")
+    quantity: int = interface.Attribute(
+        "Avalivable quantity of :class:`IProduct`s. in this :class:`IBatch`."
+    )
     eta: t.Optional[datetime] = interface.Attribute("""XXXXX""")
-    allocations: t.Set[ILine] = interface.Attribute(":class:`ILines`s that have been allocated to this :class:`IBatch`.")
-    purchased_quantity: int = interface.Attribute("Numbers of :class:`IProduct`s purchased from this :class:`IBatch`.")
+    allocations: t.Set[ILine] = interface.Attribute(
+        ":class:`ILines`s that have been allocated to this :class:`IBatch`."
+    )
+    purchased_quantity: int = interface.Attribute(
+        "Numbers of :class:`IProduct`s purchased from this :class:`IBatch`."
+    )
 
     def can_allocate(line: ILine) -> bool:
         """Check if class:`ILine` can be allocated to this :class:`IBatch`.
@@ -89,7 +97,7 @@ class IBatchRepository(interface.Interface):
         pass
 
     def allocate(line: ILine) -> None:
-        pass
+        """Batches have an ETA if they are currently shipping, or they may be in warehouse stock. We allocate to warehouse stock in preference to shipment batches. We allocate to shipment batches in order of which has the earliest ETA."""
 
     def deallocate(line: ILine) -> None:
         pass

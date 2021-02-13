@@ -36,7 +36,9 @@ class Batch:
     sku: str = field(compare=False)
     quantity: int = field(compare=False)
     eta: t.Optional[datetime] = field(compare=False, default=None)
-    allocations: t.Set[interfaces.ILine] = field(compare=False, default_factory=set, repr=False, init=False)
+    allocations: t.Set[interfaces.ILine] = field(
+        compare=False, default_factory=set, init=False
+    )
     purchased_quantity: int = field(compare=False, init=False)
 
     def __post_init__(self) -> None:

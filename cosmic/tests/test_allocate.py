@@ -27,9 +27,9 @@ def test_allocate_last_to_latest_eta(batch_repository):
 
 def test_allocate(batch_repository):
     lines = [
-        models.Line(order='order-1', sku='TEST-LAMP', quantity=5),
-        models.Line(order='order-1', sku='TEST-LAMP', quantity=3),
-        models.Line(order='order-1', sku='TEST-LAMP', quantity=2),
+        models.Line(order="order-1", sku="TEST-LAMP", quantity=5),
+        models.Line(order="order-1", sku="TEST-LAMP", quantity=3),
+        models.Line(order="order-1", sku="TEST-LAMP", quantity=2),
     ]
     order = faker.order(lines=set(lines))
     domain.allocate_order(batch_repository, order)
@@ -40,6 +40,7 @@ def test_allocate(batch_repository):
 
 def test_allocation_atomicity_fail(batch_repository):
     from cosmic.exceptions import OutOfStockException
+
     order = faker.order(
         lines={
             faker.line(quantity=10),

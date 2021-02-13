@@ -22,7 +22,9 @@ class BatchRepository:
     def allocate(self, line: interfaces.ILine) -> None:
         if self.is_allocated(line):
             return
-        batches = [i for i in self.batches if i.sku == line.sku and i.quantity >= line.quantity]
+        batches = [
+            i for i in self.batches if i.sku == line.sku and i.quantity >= line.quantity
+        ]
         if not batches:
             raise OutOfStockException(f"cannot allocate f{line}")
         batches.sort()

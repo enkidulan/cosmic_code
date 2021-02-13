@@ -2,11 +2,13 @@ from datetime import datetime
 from cosmic import models
 
 
-def batch(reference="reference-1", sku="TEST-LAMP", quantity=20, eta=datetime(1999, 1, 1)):
+def batch(
+    reference="reference-1", sku="TEST-LAMP", quantity=20, eta=datetime(1999, 1, 1)
+):
     return models.Batch(reference=reference, sku=sku, quantity=quantity, eta=eta)
 
 
-def line(order='order-1', sku="TEST-LAMP", quantity=10):
+def line(order="order-1", sku="TEST-LAMP", quantity=10):
     return models.Line(order=order, sku=sku, quantity=quantity)
 
 
