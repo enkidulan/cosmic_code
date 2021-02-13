@@ -34,3 +34,12 @@ class BatchRepository:
         for batch in self.batches:
             if batch.is_allocated(line):
                 batch.deallocate(line)
+
+    def allocate_order(self, order: interfaces.IOrder) -> None:
+        try:
+            for line in order.lines:
+                self.allocate(line)
+        except Exception:
+            for line in order.lines:
+                self.deallocate(line)
+            raise

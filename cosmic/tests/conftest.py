@@ -37,22 +37,15 @@ def batch_repository_sqla(session):
 
 
 @pytest.fixture(scope="function", params=["sqla", "mem"])
-def batch_repository(batch_repository_sqla, batch_repository_in_memory, request):
+def batch_repository(request, batch_repository_in_memory, batch_repository_sqla):
     testing_backend = request.config.getoption("--testing-backend")
-    if testing_backend and request.param == testing_backend:
+    if testing_backend and request.param != testing_backend:
         pytest.skip("Backend is not selected")
     repos = {
         "sqla": batch_repository_sqla,
         "mem": batch_repository_in_memory,
     }
     repository = repos[request.param]
-    batches = [
-        faker.batch(quantity=5, eta=datetime(1999, 1, 1)),
-        faker.batch(quantity=4, eta=None),
-        faker.batch(quantity=10, eta=datetime(2000, 1, 1)),
-    ]
-    for batch_obj in batches:
-        repository.add_batch(batch_obj)
     yield repository
 
 
